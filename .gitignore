@@ -1,0 +1,22 @@
+# Dépendances
+node_modules/
+vendor/
+
+# Logs & debug
+*.log
+debug.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers d'environnement / secrets (ne jamais versionner)
+.env
+*.sql
+sql/
+
+# Fichiers de travail / IDE
+.vscode/
+.idea/
+structure.txt
+local-xdebuginfo.php
