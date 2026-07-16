@@ -17,6 +17,7 @@ require_once CAMPUS_CORE_PATH . 'includes/documents.php';
 // --- Réseau social ---
 require_once CAMPUS_CORE_PATH . 'includes/social.php';
 require_once CAMPUS_CORE_PATH . 'includes/likes.php';
+require_once CAMPUS_CORE_PATH . 'includes/comments.php';
 
 // --- API REST ---
 require_once CAMPUS_CORE_PATH . 'includes/api.php';
