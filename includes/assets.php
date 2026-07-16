@@ -4,9 +4,6 @@ defined('ABSPATH') or die('No direct access');
 /*
 |--------------------------------------------------------------------------
 | Gestion des assets (scripts / styles)
-| LOT 3 : CampusData est désormais injecté sur TOUTES les pages pour les
-| utilisateurs connectés, afin que les widgets (profil, blogs des amis…)
-| disposent du nonce API où qu'ils soient.
 |--------------------------------------------------------------------------
 */
 
@@ -16,7 +13,6 @@ function campus_enqueue_assets() {
 
     /*
     | 1. CampusData global — disponible partout pour les connectés.
-    |    Un handle "vide" sert uniquement de support à wp_localize_script.
     */
     if (is_user_logged_in()) {
         wp_register_script('campus-global', false, [], '1.0', true);
@@ -29,8 +25,21 @@ function campus_enqueue_assets() {
     }
 
     /*
-    | 2. social.js — uniquement sur les pages contenant le shortcode [campus_social]
-    |    Dépend de campus-global pour avoir CampusData prêt avant exécution.
+    | 2. Bouton like — sur les pages d'un blog (LOT 10).
+    |    Sans dépendance dure : pour un invité, le script redirige vers /login.
+    */
+    if (is_singular('campus_blog')) {
+        wp_enqueue_script(
+            'campus-likes',
+            CAMPUS_CORE_URL . 'assets/js/likes.js',
+            [],
+            '1.0.0',
+            true
+        );
+    }
+
+    /*
+    | 3. social.js — uniquement sur les pages contenant [campus_social].
     */
     if (!is_singular()) return;
 
