@@ -3,7 +3,7 @@ defined('ABSPATH') or die('No direct access');
 
 /*
 |--------------------------------------------------------------------------
-| Campus REST API — Création de blog & Bio (Sprint 5 + LOT1 images)
+| Campus REST API — Création de blog & Bio (LOT 9 : photo obligatoire)
 |--------------------------------------------------------------------------
 */
 
@@ -35,8 +35,7 @@ function campus_register_blog_create_routes() {
 
 /*
 |--------------------------------------------------------------------------
-| POST /blogs/create  (avec image à la une optionnelle)
-| Body JSON : { "title", "content", "image_data" (base64 optionnel) }
+| POST /blogs/create  — la photo est désormais OBLIGATOIRE (LOT 9)
 |--------------------------------------------------------------------------
 */
 function campus_api_create_blog($request) {
@@ -49,11 +48,17 @@ function campus_api_create_blog($request) {
         return new WP_REST_Response(['error' => 'Votre compte est suspendu.'], 403);
     }
 
-    $title   = sanitize_text_field($request->get_param('title'));
-    $content = wp_kses_post($request->get_param('content'));
+    $title      = sanitize_text_field($request->get_param('title'));
+    $content    = wp_kses_post($request->get_param('content'));
+    $image_data = $request->get_param('image_data');
 
     if (empty($title) || empty($content)) {
         return new WP_REST_Response(['error' => 'Le titre et le contenu sont obligatoires.'], 400);
+    }
+
+    // LOT 9 : la photo est obligatoire — validation avant toute création
+    if (empty($image_data) || !preg_match('/^data:image\/(\w+);base64,/', $image_data)) {
+        return new WP_REST_Response(['error' => 'Une photo est obligatoire pour publier un blog.'], 400);
     }
 
     $rate_key = 'campus_blog_create_' . $user_id;
@@ -74,14 +79,13 @@ function campus_api_create_blog($request) {
         return new WP_REST_Response(['error' => 'Erreur lors de la création du blog.'], 500);
     }
 
-    // Image à la une (optionnelle)
-    $image_data = $request->get_param('image_data');
-    if (!empty($image_data)) {
-        $attach_id = campus_handle_base64_image($image_data, $post_id);
-        if ($attach_id) {
-            set_post_thumbnail($post_id, $attach_id);
-        }
+    // Attacher l'image ; en cas d'échec, on supprime le blog (jamais de blog sans photo)
+    $attach_id = campus_handle_base64_image($image_data, $post_id);
+    if (!$attach_id) {
+        wp_delete_post($post_id, true);
+        return new WP_REST_Response(['error' => 'Image invalide ou trop lourde (max 5 Mo).'], 400);
     }
+    set_post_thumbnail($post_id, $attach_id);
 
     $post = get_post($post_id);
 
@@ -94,7 +98,7 @@ function campus_api_create_blog($request) {
 /*
 |--------------------------------------------------------------------------
 | Helper : enregistrer une image base64 comme média WordPress
-| Retourne l'ID de l'attachment ou false
+| (renforcé LOT 9 : vérification getimagesize du contenu réel)
 |--------------------------------------------------------------------------
 */
 function campus_handle_base64_image($base64, $post_id) {
@@ -110,8 +114,7 @@ function campus_handle_base64_image($base64, $post_id) {
     $data = base64_decode(substr($base64, strpos($base64, ',') + 1));
     if ($data === false) return false;
 
-    // Limite ~5 Mo
-    if (strlen($data) > 5 * 1024 * 1024) return false;
+    if (strlen($data) > 5 * 1024 * 1024) return false; // max 5 Mo
 
     require_once ABSPATH . 'wp-admin/includes/file.php';
     require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -121,6 +124,13 @@ function campus_handle_base64_image($base64, $post_id) {
     $upload   = wp_upload_bits($filename, null, $data);
 
     if (!empty($upload['error'])) return false;
+
+    // Vérifier que le fichier est une VRAIE image (protège contre un faux MIME)
+    $check = @getimagesize($upload['file']);
+    if ($check === false) {
+        @unlink($upload['file']);
+        return false;
+    }
 
     $filetype   = wp_check_filetype($upload['file']);
     $attachment = [
