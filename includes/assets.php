@@ -25,21 +25,22 @@ function campus_enqueue_assets() {
     }
 
     /*
-    | 2. Bouton like — sur les pages d'un blog (LOT 10).
-    |    Sans dépendance dure : pour un invité, le script redirige vers /login.
+    | 2. Bouton like — sur les pages d'un blog.
     */
     if (is_singular('campus_blog')) {
-        wp_enqueue_script(
-            'campus-likes',
-            CAMPUS_CORE_URL . 'assets/js/likes.js',
-            [],
-            '1.0.0',
-            true
-        );
+        wp_enqueue_script('campus-likes', CAMPUS_CORE_URL . 'assets/js/likes.js', [], '1.0.0', true);
     }
 
     /*
-    | 3. social.js — uniquement sur les pages contenant [campus_social].
+    | 3. Bons plans — sur les pages, pour les connectés (LOT 14).
+    |    Le script s'auto-désactive s'il ne trouve pas #bonplans-app.
+    */
+    if (is_user_logged_in() && is_page()) {
+        wp_enqueue_script('campus-bonplans', CAMPUS_CORE_URL . 'assets/js/bonplans.js', ['campus-global'], '1.0.0', true);
+    }
+
+    /*
+    | 4. social.js — uniquement sur les pages contenant [campus_social].
     */
     if (!is_singular()) return;
 
@@ -48,11 +49,5 @@ function campus_enqueue_assets() {
         return;
     }
 
-    wp_enqueue_script(
-        'campus-social',
-        CAMPUS_CORE_URL . 'assets/js/social.js',
-        ['campus-global'],
-        '2.0.0',
-        true
-    );
+    wp_enqueue_script('campus-social', CAMPUS_CORE_URL . 'assets/js/social.js', ['campus-global'], '2.0.0', true);
 }
