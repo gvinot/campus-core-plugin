@@ -1,4 +1,4 @@
-// Réseau social Campus — LOT 2 (recherche + sections dédiées)
+// Réseau social Campus — noms/photos cliquables vers le profil
 document.addEventListener('DOMContentLoaded', () => {
 
     if (typeof CampusData === 'undefined') return;
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const friendsList   = document.getElementById('campus-friends');
     const requestsList  = document.getElementById('campus-requests');
 
-    if (!searchInput) return; // shortcode absent de la page
+    if (!searchInput) return;
 
     async function apiFetch(endpoint, options = {}) {
         const res = await fetch(`${API}${endpoint}`, {
@@ -32,9 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return d.innerHTML;
     }
 
+    // Nom + photo cliquables → /membre?id=
     function personHTML(p, actionHtml) {
-        return `<img src="${p.avatar_url}" alt="">`
-             + `<span class="campus-person-name">${escHtml(p.name || p.display_name)}</span>`
+        const pid  = p.id || p.friend_id || p.user_id;
+        const name = escHtml(p.name || p.display_name);
+        return `<a href="/membre?id=${pid}" style="display:flex;align-items:center;gap:12px;flex:1;text-decoration:none;color:inherit;">`
+             + `<img src="${p.avatar_url}" alt="">`
+             + `<span class="campus-person-name">${name}</span>`
+             + `</a>`
              + `<span class="campus-person-action">${actionHtml}</span>`;
     }
 

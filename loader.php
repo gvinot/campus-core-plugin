@@ -30,7 +30,8 @@ require_once CAMPUS_CORE_PATH . 'includes/api-admin.php';
 require_once CAMPUS_CORE_PATH . 'includes/api-documents.php';
 
 // --- Affichage front ---
-require_once CAMPUS_CORE_PATH . 'includes/single-display.php';  // LOT 7
+require_once CAMPUS_CORE_PATH . 'includes/single-display.php';
+require_once CAMPUS_CORE_PATH . 'includes/member-profile.php';  // Profil public
 
 // --- Admin & utilitaires ---
 require_once CAMPUS_CORE_PATH . 'includes/admin.php';
@@ -38,6 +39,7 @@ require_once CAMPUS_CORE_PATH . 'includes/users.php';
 require_once CAMPUS_CORE_PATH . 'includes/blogs.php';
 require_once CAMPUS_CORE_PATH . 'includes/assets.php';
 require_once CAMPUS_CORE_PATH . 'includes/menu.php';
+require_once CAMPUS_CORE_PATH . 'includes/admin-bar.php';
 
 // --- Templates ---
 require_once CAMPUS_CORE_PATH . 'templates/social-front.php';
