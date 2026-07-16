@@ -13,6 +13,7 @@ require_once CAMPUS_CORE_PATH . 'includes/post-types.php';
 require_once CAMPUS_CORE_PATH . 'includes/permissions.php';
 require_once CAMPUS_CORE_PATH . 'includes/destinations.php';
 require_once CAMPUS_CORE_PATH . 'includes/documents.php';
+require_once CAMPUS_CORE_PATH . 'includes/bonplans.php';        // LOT 14
 
 // --- Réseau social ---
 require_once CAMPUS_CORE_PATH . 'includes/social.php';
@@ -28,10 +29,11 @@ require_once CAMPUS_CORE_PATH . 'includes/api-users.php';
 require_once CAMPUS_CORE_PATH . 'includes/api-social.php';
 require_once CAMPUS_CORE_PATH . 'includes/api-admin.php';
 require_once CAMPUS_CORE_PATH . 'includes/api-documents.php';
+require_once CAMPUS_CORE_PATH . 'includes/api-bonplans.php';   // LOT 14
 
 // --- Affichage front ---
 require_once CAMPUS_CORE_PATH . 'includes/single-display.php';
-require_once CAMPUS_CORE_PATH . 'includes/member-profile.php';  // Profil public
+require_once CAMPUS_CORE_PATH . 'includes/member-profile.php';
 
 // --- Admin & utilitaires ---
 require_once CAMPUS_CORE_PATH . 'includes/admin.php';
