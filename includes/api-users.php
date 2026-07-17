@@ -190,9 +190,15 @@ function campus_format_user($user_id, $private = false) {
     $user = get_user_by('id', $user_id);
     if (!$user) return null;
 
-    // Avatar : priorité à la meta campus, sinon Gravatar WordPress
+    // Avatar : priorité à la photo personnalisée, sinon avatar par défaut aux couleurs ISEL
     $custom_avatar = get_user_meta($user_id, 'campus_avatar_url', true);
-    $avatar_url    = $custom_avatar ?: get_avatar_url($user_id, ['size' => 80]);
+    if ($custom_avatar) {
+        $avatar_url = $custom_avatar;
+    } else {
+        // Avatar généré à partir des initiales (fond bleu marine, texte blanc)
+        $initials   = urlencode($user->display_name);
+        $avatar_url = campus_get_avatar_url($user_id, 80);
+    }
 
     // Destination assignée
     $destination_id   = get_user_meta($user_id, 'campus_destination_id', true);

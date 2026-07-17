@@ -12,14 +12,24 @@ côté thème.
 
 ## Sommaire
 
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Architecture](#architecture)
-- [Rôles et permissions](#rôles-et-permissions)
-- [API REST](#api-rest)
-- [Base de données](#base-de-données)
-- [Sécurité](#sécurité)
-- [Désinstallation](#désinstallation)
+- [Campus Core](#campus-core)
+  - [Sommaire](#sommaire)
+  - [Prérequis](#prérequis)
+  - [Installation](#installation)
+  - [Architecture](#architecture)
+  - [Rôles et permissions](#rôles-et-permissions)
+  - [API REST](#api-rest)
+    - [Amis](#amis)
+    - [Blogs](#blogs)
+    - [Destinations](#destinations)
+    - [Utilisateurs](#utilisateurs)
+    - [Actualités \& Admin](#actualités--admin)
+  - [Base de données](#base-de-données)
+    - [`wp_campus_friends`](#wp_campus_friends)
+    - [`wp_campus_likes`](#wp_campus_likes)
+  - [Sécurité](#sécurité)
+  - [Désinstallation](#désinstallation)
+  - [Auteur](#auteur)
 
 ---
 
@@ -216,4 +226,4 @@ pour éviter toute perte de données accidentelle.
 
 ## Auteur
 
-Guillaume Vinot — projet Glob'ISEL (ISEL, 2026)
+Guillaume Vinot - projet Glob'ISEL (ISEL, 2026)

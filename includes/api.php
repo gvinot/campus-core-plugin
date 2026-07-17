@@ -162,7 +162,7 @@ function campus_api_users() {
         $data[] = [
             'id'         => (int) $user->ID,
             'name'       => $user->display_name,
-            'avatar_url' => get_avatar_url($user->ID, ['size' => 40]),
+            'avatar_url' => campus_get_avatar_url($user->ID, 40),
         ];
     }
 

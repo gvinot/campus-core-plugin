@@ -53,7 +53,7 @@ function campus_api_search_users($request) {
         $data[] = [
             'id'         => $uid,
             'name'       => $user->display_name,
-            'avatar_url' => get_avatar_url($uid, ['size' => 40]),
+            'avatar_url' => campus_get_avatar_url($uid, 40),
             'friendship' => campus_get_friendship_status($current_id, $uid),
         ];
     }

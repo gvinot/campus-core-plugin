@@ -204,7 +204,7 @@ function campus_format_blog($post, $like_count = null) {
         'author'           => [
             'id'           => $author_id,
             'name'         => $author_data ? $author_data->display_name : '',
-            'avatar_url'   => get_avatar_url($author_id, ['size' => 40]),
+            'avatar_url'   => campus_get_avatar_url($author_id, 40),
         ],
         'destination'      => [
             'id'           => (int) $destination_id,

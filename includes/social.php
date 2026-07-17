@@ -155,7 +155,7 @@ function campus_get_friends($user_id) {
         $friends[] = [
             'friend_id'    => (int) $row->friend_id,
             'display_name' => $user_data->display_name,
-            'avatar_url'   => get_avatar_url($row->friend_id, ['size' => 40]),
+            'avatar_url'   => campus_get_avatar_url($row->friend_id, 40),
         ];
     }
 
@@ -186,7 +186,7 @@ function campus_get_pending_requests($user_id) {
         $requests[] = [
             'user_id'      => (int) $row->user_id,
             'display_name' => $user_data->display_name,
-            'avatar_url'   => get_avatar_url($row->user_id, ['size' => 40]),
+            'avatar_url'   => campus_get_avatar_url($row->user_id, 40),
         ];
     }
 
