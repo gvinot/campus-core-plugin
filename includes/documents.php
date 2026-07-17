@@ -3,7 +3,7 @@ defined('ABSPATH') or die('No direct access');
 
 /*
 |--------------------------------------------------------------------------
-| Documents administratifs (LOT 5)
+| Documents administratifs
 |--------------------------------------------------------------------------
 | CPT campus_document : documents à télécharger (bourse, visa, logement…)
 | Chaque document a : un fichier (URL), une catégorie, une description.
@@ -57,6 +57,7 @@ function campus_document_render($post) {
         'bourse'      => 'Bourse',
         'visa'        => 'Visa',
         'logement'    => 'Logement',
+        'assurance'   => 'Assurance',
         'inscription' => 'Inscription',
         'autre'       => 'Autre',
     ];
@@ -96,7 +97,7 @@ function campus_document_save($post_id) {
     }
 
     if (isset($_POST['campus_doc_category'])) {
-        $allowed = ['bourse', 'visa', 'logement', 'inscription', 'autre'];
+        $allowed = ['bourse', 'visa', 'logement', 'assurance', 'inscription', 'autre'];
         $cat     = sanitize_text_field($_POST['campus_doc_category']);
         if (in_array($cat, $allowed, true)) {
             update_post_meta($post_id, '_campus_doc_category', $cat);
