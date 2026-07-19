@@ -124,14 +124,26 @@ function campus_api_get_user_blogs($request) {
         return new WP_REST_Response(['error' => 'Utilisateur introuvable.'], 404);
     }
 
+        $coauthored = campus_get_coauthored_blog_ids($user_id);
+
     $query = new WP_Query([
         'post_type'      => 'campus_blog',
         'post_status'    => 'publish',
-        'author'         => $user_id,
         'posts_per_page' => $per_page,
         'paged'          => $page,
         'orderby'        => 'date',
         'order'          => 'DESC',
+        // Inclut : blogs dont il est auteur OU co-auteur
+        'post__in'       => array_merge(
+            get_posts([
+                'post_type'   => 'campus_blog',
+                'post_status' => 'publish',
+                'author'      => $user_id,
+                'fields'      => 'ids',
+                'numberposts' => -1,
+            ]),
+            $coauthored
+        ) ?: [0], // [0] évite de tout retourner si la liste est vide
     ]);
 
     $blogs = [];
@@ -290,3 +302,24 @@ function campus_get_display_role($user_id) {
     return 'student';
 }
 
+add_action('rest_api_init', function () {
+    register_rest_route('campus/v1', '/stats', [
+        'methods'             => 'GET',
+        'callback'            => 'campus_api_stats',
+        'permission_callback' => '__return_true', // public (page d'accueil)
+    ]);
+});
+
+function campus_api_stats() {
+    // Compte les étudiants + blogueurs (exclut les admins)
+    $students = get_users(['role__in' => ['campus_student', 'campus_blogger'], 'fields' => 'ID']);
+
+    $blogs = wp_count_posts('campus_blog');
+    $destinations = wp_count_posts('campus_destination');
+
+    return new WP_REST_Response([
+        'etudiants'    => count($students),
+        'blogs'        => (int) $blogs->publish,
+        'destinations' => (int) $destinations->publish,
+    ], 200);
+}

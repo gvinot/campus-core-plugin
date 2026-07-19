@@ -3,7 +3,11 @@ defined('ABSPATH') or die('No direct access');
 
 /*
 |--------------------------------------------------------------------------
-| Campus REST API — Création de blog & Bio (LOT 9 : photo obligatoire)
+| Campus REST API — Création de blog & Bio
+|--------------------------------------------------------------------------
+| - Photo obligatoire (LOT 9)
+| - Co-auteurs parmi les amis (feature blogs groupés)
+| - MODÉRATION : les blogs des non-admins passent "en attente" de validation
 |--------------------------------------------------------------------------
 */
 
@@ -35,7 +39,7 @@ function campus_register_blog_create_routes() {
 
 /*
 |--------------------------------------------------------------------------
-| POST /blogs/create  — la photo est désormais OBLIGATOIRE (LOT 9)
+| POST /blogs/create
 |--------------------------------------------------------------------------
 */
 function campus_api_create_blog($request) {
@@ -56,7 +60,7 @@ function campus_api_create_blog($request) {
         return new WP_REST_Response(['error' => 'Le titre et le contenu sont obligatoires.'], 400);
     }
 
-    // LOT 9 : la photo est obligatoire — validation avant toute création
+    // Photo obligatoire
     if (empty($image_data) || !preg_match('/^data:image\/(\w+);base64,/', $image_data)) {
         return new WP_REST_Response(['error' => 'Une photo est obligatoire pour publier un blog.'], 400);
     }
@@ -67,11 +71,18 @@ function campus_api_create_blog($request) {
     }
     set_transient($rate_key, 1, 30);
 
+    /*
+    | MODÉRATION : publication immédiate pour les admins,
+    | "en attente" (pending) pour les étudiants/blogueurs.
+    | L'administrateur valide ensuite depuis WP Admin → Blogs.
+    */
+    $status = campus_is_admin($user_id) ? 'publish' : 'pending';
+
     $post_id = wp_insert_post([
         'post_type'    => 'campus_blog',
         'post_title'   => $title,
         'post_content' => $content,
-        'post_status'  => 'publish',
+        'post_status'  => $status,
         'post_author'  => $user_id,
     ], true);
 
@@ -79,7 +90,7 @@ function campus_api_create_blog($request) {
         return new WP_REST_Response(['error' => 'Erreur lors de la création du blog.'], 500);
     }
 
-    // Attacher l'image ; en cas d'échec, on supprime le blog (jamais de blog sans photo)
+    // Image à la une ; en cas d'échec, on supprime le blog (jamais de blog sans photo)
     $attach_id = campus_handle_base64_image($image_data, $post_id);
     if (!$attach_id) {
         wp_delete_post($post_id, true);
@@ -87,10 +98,17 @@ function campus_api_create_blog($request) {
     }
     set_post_thumbnail($post_id, $attach_id);
 
+    // Co-auteurs (uniquement des amis de l'auteur, validé côté serveur)
+    $coauthors = $request->get_param('coauthors');
+    if (!empty($coauthors) && is_array($coauthors)) {
+        campus_set_coauthors($post_id, $user_id, $coauthors);
+    }
+
     $post = get_post($post_id);
 
     return new WP_REST_Response([
         'success' => true,
+        'pending' => ($status === 'pending'),
         'blog'    => campus_format_blog($post, 0),
     ], 201);
 }
@@ -98,7 +116,6 @@ function campus_api_create_blog($request) {
 /*
 |--------------------------------------------------------------------------
 | Helper : enregistrer une image base64 comme média WordPress
-| (renforcé LOT 9 : vérification getimagesize du contenu réel)
 |--------------------------------------------------------------------------
 */
 function campus_handle_base64_image($base64, $post_id) {
@@ -113,8 +130,7 @@ function campus_handle_base64_image($base64, $post_id) {
 
     $data = base64_decode(substr($base64, strpos($base64, ',') + 1));
     if ($data === false) return false;
-
-    if (strlen($data) > 5 * 1024 * 1024) return false; // max 5 Mo
+    if (strlen($data) > 5 * 1024 * 1024) return false;
 
     require_once ABSPATH . 'wp-admin/includes/file.php';
     require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -122,10 +138,9 @@ function campus_handle_base64_image($base64, $post_id) {
 
     $filename = 'blog-' . $post_id . '-' . time() . '.' . $ext;
     $upload   = wp_upload_bits($filename, null, $data);
-
     if (!empty($upload['error'])) return false;
 
-    // Vérifier que le fichier est une VRAIE image (protège contre un faux MIME)
+    // Vérifier que c'est une vraie image
     $check = @getimagesize($upload['file']);
     if ($check === false) {
         @unlink($upload['file']);

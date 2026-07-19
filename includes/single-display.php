@@ -22,7 +22,16 @@ function campus_prepend_featured_image($content) {
     if (!has_post_thumbnail()) return $content;
 
     $img = get_the_post_thumbnail(get_the_ID(), 'large', ['class' => 'campus-featured-img']);
-    return '<div class="campus-featured-wrap">' . $img . '</div>' . $content;
+    $coauthors = campus_get_coauthors_data(get_the_ID());
+    $credit = '';
+    if (!empty($coauthors)) {
+        $names = array_map(function($c){ return esc_html($c['name']); }, $coauthors);
+        $credit = '<p style="color:#888;font-size:14px;margin:12px 0 0;">'
+                . 'En collaboration avec : <strong style="color:#E8621A;">'
+                . implode(', ', $names) . '</strong></p>';
+    }
+
+    return '<div class="campus-featured-wrap">' . $img . $credit . '</div>' . $content;
 }
 
 /*
