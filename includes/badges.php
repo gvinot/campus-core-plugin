@@ -11,7 +11,9 @@ defined('ABSPATH') or die('No direct access');
 |--------------------------------------------------------------------------
 */
 
-define('CAMPUS_LICORNE_SEUIL', 100); // total likes + votes utiles pour la Licorne
+define('CAMPUS_LICORNE_SEUIL', 100);   // total likes + votes utiles pour la Licorne
+define('CAMPUS_BACKPACKER_SEUIL', 5);  // bons plans pour le badge Backpacker
+define('CAMPUS_LEGENDE_SEUIL', 5);     // nombre de badges pour Légende Glob'ISEL
 
 /*
 | Helpers de comptage
@@ -179,6 +181,47 @@ function campus_is_visionary($user_id) {
     return false;
 }
 
+ // Éclaireur : a publié le 1er blog d'au moins une destination
+    function campus_is_first_blogger($user_id) {
+        global $wpdb;
+        $blogs = $wpdb->get_results("
+            SELECT ID, post_author, post_date
+            FROM {$wpdb->posts}
+            WHERE post_type = 'campus_blog' AND post_status = 'publish'
+            ORDER BY post_date ASC
+        ");
+        $seen = [];
+        foreach ($blogs as $b) {
+            $dest = (int) get_user_meta($b->post_author, 'campus_destination_id', true);
+            if (!$dest) continue;
+            if (isset($seen[$dest])) continue;
+            $seen[$dest] = true;
+            if ((int) $b->post_author === $user_id) return true;
+        }
+        return false;
+    }
+
+    // Pionnier : assigné à une destination sans aucun blog publié
+    function campus_is_pioneer($user_id) {
+        $dest_id = (int) get_user_meta($user_id, 'campus_destination_id', true);
+        if (!$dest_id) return false;
+
+        $authors_on_dest = get_users([
+            'meta_key'   => 'campus_destination_id',
+            'meta_value' => $dest_id,
+            'fields'     => 'ID',
+        ]);
+        if (empty($authors_on_dest)) return true;
+
+        $blogs = get_posts([
+            'post_type'   => 'campus_blog',
+            'post_status' => 'publish',
+            'author__in'  => $authors_on_dest,
+            'fields'      => 'ids',
+            'numberposts' => 1,
+        ]);
+        return empty($blogs);
+    }
 /*
 | Assemblage : liste des badges obtenus par un utilisateur
 |--------------------------------------------------------------------------
@@ -222,6 +265,20 @@ function campus_get_user_badges($user_id) {
     if ((campus_count_likes_received($user_id) + campus_count_votes_received($user_id)) >= CAMPUS_LICORNE_SEUIL) {
         $add('🦄', 'Licorne', 'Plus de ' . CAMPUS_LICORNE_SEUIL . ' réactions positives.');
     }
+    // Éclaireur : 1er blog d'une destination
+    if (campus_is_first_blogger($user_id)) {
+        $add('✈️', 'Éclaireur', 'Premier à bloger une destination.');
+    }
+
+    // Pionnier : destination sans aucun blog
+    if (campus_is_pioneer($user_id)) {
+        $add('🛰️', 'Pionnier', 'Explore une destination encore vierge de retours.');
+    }
+
+    // Backpacker : seuil de bons plans partagés
+    if (campus_count_user_bonplans($user_id) >= CAMPUS_BACKPACKER_SEUIL) {
+        $add('🎒', 'Backpacker', 'A partagé de nombreux bons plans.');
+    }
 
     // --- Badge profil ---
     $has_bio    = !empty(get_user_meta($user_id, 'campus_bio', true));
@@ -229,6 +286,11 @@ function campus_get_user_badges($user_id) {
     $has_dest   = !empty(get_user_meta($user_id, 'campus_destination_id', true));
     if ($has_bio && $has_avatar && $has_dest) {
         $add('🎯', 'Perfectionniste', 'A complété entièrement son profil.');
+    }
+
+        // Légende Glob'ISEL — DOIT être en DERNIER (compte les badges ci-dessus)
+    if (count($badges) >= CAMPUS_LEGENDE_SEUIL) {
+        $add('👑', 'Légende Glob\'ISEL', 'Distinction ultime des membres les plus engagés.');
     }
 
     return $badges;

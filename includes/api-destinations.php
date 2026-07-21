@@ -248,6 +248,7 @@ function campus_format_destination($post, $with_bloggers = false) {
         ],
         'bloggers_count'  => count($bloggers),
         'bloggers'        => $bloggers,
+        'website'         => get_post_meta($post->ID, '_campus_website', true),
     ];
 
     return $data;

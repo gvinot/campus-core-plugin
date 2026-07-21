@@ -8,14 +8,18 @@ defined('ABSPATH') or die('No direct access');
 // Redirection après connexion → accueil
 add_filter('tml_action_url', function($url, $action) {
     if ($action === 'login') {
-        return home_url('/');
+        return home_url('/blogs');
     }
     return $url;
 }, 10, 2);
 
 add_filter('login_redirect', function($redirect_to, $request, $user) {
     if (isset($user->roles) && !empty($user->roles)) {
-        return home_url('/');
+        // Les admins gardent l'accès au tableau de bord WP
+        if (in_array('administrator', (array) $user->roles, true)) {
+            return admin_url();
+        }
+        return home_url('/blogs');
     }
     return $redirect_to;
 }, 10, 3);

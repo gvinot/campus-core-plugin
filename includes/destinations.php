@@ -67,6 +67,17 @@ function campus_destination_coords_render($post) {
         Trouve les coordonnées sur
         <a href="https://www.latlong.net" target="_blank">latlong.net</a>
     </p>
+    <p>
+        <label for="campus_website"><strong>Site officiel de l'université</strong></label><br>
+        <input
+            type="url"
+            id="campus_website"
+            name="campus_website"
+            value="<?php echo esc_attr(get_post_meta($post->ID, '_campus_website', true)); ?>"
+            style="width:100%"
+            placeholder="https://universite-exemple.edu"
+        >
+    </p>
     <?php
 }
 
@@ -101,5 +112,9 @@ function campus_destination_save_coords($post_id) {
         if ($lng >= -180 && $lng <= 180) {
             update_post_meta($post_id, '_campus_lng', $lng);
         }
+    }
+    
+    if (isset($_POST['campus_website'])) {
+        update_post_meta($post_id, '_campus_website', esc_url_raw($_POST['campus_website']));
     }
 }
