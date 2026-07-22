@@ -65,18 +65,12 @@ function campus_registration_fields() {
     $first = !empty($_POST['first_name']) ? esc_attr(wp_unslash($_POST['first_name'])) : '';
     $last  = !empty($_POST['last_name'])  ? esc_attr(wp_unslash($_POST['last_name']))  : '';
     ?>
-    <p>
-        <label for="first_name">Prénom<br>
-            <input type="text" name="first_name" id="first_name" class="input"
-                   value="<?php echo $first; ?>" size="25" required>
-        </label>
-    </p>
-    <p>
-        <label for="last_name">Nom<br>
-            <input type="text" name="last_name" id="last_name" class="input"
-                   value="<?php echo $last; ?>" size="25" required>
-        </label>
-    </p>
+    <div class="campus-name-fields">
+        <p><label for="first_name">Prénom<br>
+            <input type="text" name="first_name" id="first_name" class="input" value="<?php echo $first; ?>" size="25" required></label></p>
+        <p><label for="last_name">Nom<br>
+            <input type="text" name="last_name" id="last_name" class="input" value="<?php echo $last; ?>" size="25" required></label></p>
+    </div>
     <?php
 }
 

@@ -95,7 +95,7 @@ add_action('template_redirect', 'campus_restrict_member_pages');
 function campus_restrict_member_pages() {
     if (is_user_logged_in()) return;
 
-    $restricted = ['blogs', 'mon-profil', 'administratif'];
+    $restricted = ['blogs', 'mon-profil', 'mon-compte', 'administratif', 'bons-plans'];
     if (is_page($restricted)) {
         wp_safe_redirect(home_url('/login'));
         exit;
