@@ -11,6 +11,7 @@ defined('ABSPATH') or die('No direct access');
 require_once CAMPUS_CORE_PATH . 'includes/roles.php';
 require_once CAMPUS_CORE_PATH . 'includes/post-types.php';
 require_once CAMPUS_CORE_PATH . 'includes/permissions.php';
+require_once CAMPUS_CORE_PATH . 'includes/auth.php';
 require_once CAMPUS_CORE_PATH . 'includes/destinations.php';
 require_once CAMPUS_CORE_PATH . 'includes/documents.php';
 require_once CAMPUS_CORE_PATH . 'includes/bonplans.php';
