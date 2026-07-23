@@ -104,6 +104,26 @@ function campus_restrict_member_pages() {
 
 /*
 |--------------------------------------------------------------------------
+| Accès à l'administration WordPress
+|--------------------------------------------------------------------------
+| Seuls les administrateurs ont besoin de /wp-admin. Les autres membres y
+| sont renvoyés vers le site.
+|
+| La condition sur wp_doing_ajax() est indispensable : les requêtes AJAX
+| passent par admin-ajax.php et seraient sinon redirigées, ce qui casserait
+| le fonctionnement du front.
+|--------------------------------------------------------------------------
+*/
+add_action('admin_init', 'campus_block_admin_access');
+function campus_block_admin_access() {
+    if (!current_user_can('manage_options') && !wp_doing_ajax()) {
+        wp_safe_redirect(home_url('/blogs/'));
+        exit;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Blocage publication non autorisée
 |--------------------------------------------------------------------------
 */
