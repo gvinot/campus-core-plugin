@@ -272,7 +272,7 @@ function campus_get_user_badges($user_id) {
 
     // Pionnier : destination sans aucun blog
     if (campus_is_pioneer($user_id)) {
-        $add('🛰️', 'Pionnier', 'Explore une destination encore vierge de retours.');
+        $add('🛰️', 'Pionnier', 'Explore une destination sans retours d\'experience.');
     }
 
     // Backpacker : seuil de bons plans partagés
