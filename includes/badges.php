@@ -249,10 +249,10 @@ function campus_get_user_badges($user_id) {
         $add('📍', 'Local Guide', 'A partagé le plus de bons plans.');
     }
     if ($user_id === campus_top_voted_bonplan_author_id()) {
-        $add('🧭', 'Guide Ultime', 'Son bon plan est le plus jugé utile.');
+        $add('🧭', 'Guide Ultime', 'Son bon plan est jugé le plus utile.');
     }
     if (campus_is_visionary($user_id)) {
-        $add('🔮', 'Visionnaire', 'Premier à révéler une destination.');
+        $add('🔮', 'Visionnaire', 'Premier bon plan partagé d\'une destination.');
     }
     if (campus_is_intrepid($user_id)) {
         $add('🛡️', 'L\'Intrépide', 'Explore une destination sans bon plan.');
